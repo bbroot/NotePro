@@ -1,42 +1,60 @@
 # MarkFlowy
 
-**轻量级 Markdown 编辑器** — 类 Typora 的所见即所得写作体验，纯浏览器运行，无需后端。
+**浏览器里的 Typora** — 零安装、零配置，开箱即用的 Markdown 所见即所得编辑器。数据完全存储在本地，无后端、无账号、无隐私顾虑。
 
-[在线体验](#) | [功能特性](#功能特性) | [安装使用](#安装使用) | [客户部署](#客户部署) | [技术栈](#技术栈)
+[在线体验](#) | [功能特性](#功能特性) | [安装使用](#安装使用) | [技术栈](#技术栈)
+
+---
+
+## 🎯 为什么选 MarkFlowy？
+
+| 特性 | 说明 |
+|------|------|
+| 🖊️ **零学习成本** | 所见即所得，打字即时渲染，无需记住复杂语法 |
+| 📂 **版本历史** | 自动快照，可视化 diff 对比，一键回滚到任意历史版本 |
+| 🔒 **本地优先** | 数据完全存储在本地 IndexedDB / 文件系统，隐私安全 |
+| 🌐 **零安装运行** | 纯浏览器，Chrome/Edge 直接打开即用，无需 Node/Python |
+| 🎨 **5 种主题** | 浅色 / 深色 / 跟随系统 / GitHub 浅 / GitHub 深 |
+| ⚡ **轻量快速** | 打包后仅 ~300KB，无任何外部依赖 |
 
 ---
 
 ## ✨ 功能特性
 
-### 📝 编辑器核心
-- **所见即所得 (WYSIWYG)** — 像 Word 一样写作，Markdown 语法自动渲染
-- **源码模式** — 按 `⌘/` 随时切换到纯 Markdown 源码编辑
-- **实时预览** — 编辑即渲染，无需分屏
-- **完整 Markdown 支持** — 标题、列表、引用、代码块、表格、图片、链接等
+### 📝 所见即所得编辑
+- 实时渲染 Markdown，**打字即出效果**
+- `⌘B` 加粗 · `⌘I` 斜体 · `⌘⇧X` 删除线 · `⌘K` 链接 · `` ⌘` `` 行内代码
+- 标题 1-3 级快捷键（`⌘1/2/3`）
+- 有序列表、无序列表、引用块、代码块（语法高亮）
+- 表格编辑：插入行/列、合并单元格、快捷键操作
 
-### 🎨 格式化工具
-- 标题 1-3 级快捷键 (`⌘1/2/3`)
-- 加粗 (`⌘B`)、斜体 (`⌘I`)、删除线 (`⌘⇧X`)
-- 行内代码 (`` ⌘` ``)、链接 (`⌘K`)
-- 有序/无序列表、引用块、代码块
-- 表格编辑（插入行列、合并单元格）
+### 📄 源码模式
+- 按 `⌘/` 随时切换 Markdown 源码视图
+- 源码模式下 `⌘S` 同步回渲染视图，blur 自动保存
+- 完整保留所有 Markdown 语法标记
 
 ### 📂 文件管理
-- 打开本地文件夹（File System Access API）
-- 多标签页编辑
-- 自动保存（可配置间隔）
-- 版本历史（基于 Git 快照）
-- 差异对比与版本恢复
+- **打开本地文件夹**：File System Access API，文件直接在本地读写
+- **打开单个文件**：支持从任意位置打开 Markdown 文件
+- 多标签页同时编辑
+- 拖放导入：拖入 `.md` 文件或文件夹，自动解析文件树
+- **自动保存**：可配置间隔（默认 30s），不必担心丢失更改
 
-### 🎯 用户体验
-- 5 种主题：浅色、深色、跟随系统、GitHub 浅色/深色
-- 可调字号（12-32px）和行高（1.4-2.5）
-- 专注模式（隐藏侧边栏）
-- 键盘快捷键完整支持
+### 🕐 版本历史 ⭐
+- 每次保存自动生成 Git 快照（基于 isomorphic-git）
+- 历史记录面板：**可视化 diff 对比**，新增绿色、删除红色，一目了然
+- **一键恢复**：点击任意历史版本，内容完整还原
+- 支持撤销/重做（`⌘Z` / `⌘⇧Z`）
 
-### 🔒 浏览器兼容
-- **Chrome / Edge** — 完整功能（File System Access API）
-- **Firefox / Safari** — 内存模式 + IndexedDB 持久化
+### 🎨 个性化
+- **5 种主题**：浅色 / 深色 / 跟随系统 / GitHub Light / GitHub Dark
+- 可调字号（12–32px）和行高（1.4–2.5）
+- 专注模式：隐藏侧边栏，全屏写作
+- 完整键盘快捷键支持
+
+### 🌐 浏览器兼容
+- **Chrome 86+ / Edge 86+**：完整功能（File System Access API）
+- **Firefox / Safari**：内存模式 + IndexedDB 持久化（功能受限）
 
 ---
 
@@ -46,8 +64,8 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/your-username/markflowy.git
-cd markflowy
+git clone https://github.com/bbroot/MarkFlowy.git
+cd MarkFlowy
 
 # 安装依赖
 npm install
@@ -59,69 +77,29 @@ npm run dev
 npm run build
 ```
 
-### 方式二：静态部署
+### 方式二：浏览器直接打开
 
-构建后将 `dist/` 目录部署到任意静态托管服务：
+构建后打开 `dist/index.html`，或使用任意静态服务器：
 
 ```bash
-npm run build
-# 将 dist/ 目录上传到 Vercel / Netlify / GitHub Pages 等
+# Python
+python3 -m http.server 3000
+
+# Node.js
+npx serve dist
 ```
 
----
-
-## 📦 客户部署（零环境一键启动）
-
-### 打包分发包
+### 方式三：零配置打包分发
 
 ```bash
 npm run package
-# 产物: markflowy-<version>-portable.zip (仅 ~300KB)
+# 产物: markflowy-<version>-portable.zip (~300KB)
 ```
 
-### 客户使用
+**macOS / Linux**: 解压后运行 `bash start.sh`
+**Windows**: 双击 `start.bat` 或运行 `powershell -ExecutionPolicy Bypass -File start.ps1`
 
-**macOS / Linux:**
-```bash
-# 解压后运行
-./start.sh
-```
-
-**Windows:**
-```cmd
-:: 双击 start.bat 或在 PowerShell 中运行:
-powershell -ExecutionPolicy Bypass -File start.ps1
-```
-
-### 自动环境检测流程
-
-启动脚本会按以下优先级自动检测并处理：
-
-```
-1. 检查 Node.js ≥ 18
-   ├── 已安装 → 使用 npx serve 启动 (最佳体验)
-   └── 未安装 → 提示安装
-       ├── [推荐] fnm 自动安装 Node.js LTS
-       ├── [备选] nvm 安装
-       ├── [备选] winget 安装 (Windows)
-       └── [兜底] 直接下载 Node.js 二进制包
-
-2. Node.js 不可用时降级
-   ├── Python 3 → python3 -m http.server
-   ├── Python 2 → python -m SimpleHTTPServer
-   └── .NET 内置 → 仅 Windows PowerShell (start.ps1)
-
-3. 自动打开浏览器访问 http://localhost:3000
-```
-
-### 系统要求
-
-| 环境 | 要求 | 用途 |
-|------|------|------|
-| **浏览器** | Chrome 86+ / Edge 86+ | File System Access API（完整功能） |
-| **浏览器** | Firefox / Safari | 内存模式（功能受限） |
-| **Node.js** | ≥ 18 | HTTP 服务器（推荐，脚本可自动安装） |
-| **Python** | 3.x / 2.7 | HTTP 服务器（备选） |
+启动脚本自动检测环境（Node.js → Python → .NET），无需手动配置。
 
 ---
 
@@ -131,25 +109,30 @@ powershell -ExecutionPolicy Bypass -File start.ps1
 |------|------|------|
 | 框架 | React 18 | UI 组件化 |
 | 状态管理 | Zustand | 轻量全局状态 |
-| 编辑器引擎 | ProseMirror | 所见即所得编辑 |
-| Markdown 解析 | markdown-it | 解析与渲染 |
-| 版本历史 | isomorphic-git + IndexedDB | Git 快照 |
+| 编辑器引擎 | **ProseMirror** | 所见即所得编辑核心 |
+| Markdown 解析 | markdown-it + Shiki | 解析渲染 + 语法高亮 |
+| 版本历史 | **isomorphic-git + IndexedDB** | 本地 Git 快照 |
 | 样式 | Tailwind CSS | 原子化 CSS |
-| 构建工具 | Vite | 快速开发与构建 |
+| 构建工具 | Vite | 快速构建 |
 
 ---
 
 ## ⌨️ 快捷键
 
+### 文件操作
 | 快捷键 | 功能 |
 |--------|------|
-| `⌘S` | 保存文件 |
-| `⌘⇧S` | 另存为 |
 | `⌘N` | 新建文件 |
 | `⌘O` | 打开文件夹 |
+| `⌘⇧O` | 打开单个文件 |
+| `⌘S` | 保存文件 |
+| `⌘⇧S` | 另存为 |
 | `⌘W` | 关闭标签页 |
-| `⌘E` | 导出文件 |
-| `⌘/` | 切换源码模式 |
+| `⌘E` | 导出 |
+
+### 格式化
+| 快捷键 | 功能 |
+|--------|------|
 | `⌘B` | 加粗 |
 | `⌘I` | 斜体 |
 | `⌘⇧X` | 删除线 |
@@ -157,6 +140,11 @@ powershell -ExecutionPolicy Bypass -File start.ps1
 | `⌘K` | 插入链接 |
 | `⌘1/2/3` | 标题 1/2/3 |
 | `⌘0` | 正文 |
+| `⌘/` | 切换源码模式 |
+
+### 编辑
+| 快捷键 | 功能 |
+|--------|------|
 | `⌘Z` | 撤销 |
 | `⌘⇧Z` | 重做 |
 
@@ -167,29 +155,25 @@ powershell -ExecutionPolicy Bypass -File start.ps1
 ```
 markflowy/
 ├── src/
-│   ├── components/       # React 组件
-│   │   ├── Editor.tsx    # 编辑器主组件
-│   │   ├── Toolbar.tsx   # 工具栏
-│   │   ├── Sidebar.tsx   # 文件树侧边栏
-│   │   ├── TabBar.tsx    # 标签栏
-│   │   ├── HistoryPanel.tsx  # 历史记录面板
-│   │   └── SettingsPanel.tsx # 设置面板
+│   ├── components/
+│   │   ├── Editor.tsx         # ProseMirror 编辑器 + 源码模式
+│   │   ├── Toolbar.tsx        # 格式化工具栏
+│   │   ├── Sidebar.tsx       # 递归文件树 + 拖放
+│   │   ├── TabBar.tsx        # 多标签页
+│   │   ├── HistoryPanel.tsx  # 版本历史 + diff 对比
+│   │   └── SettingsPanel.tsx # 主题/字体/自动保存设置
 │   ├── lib/
-│   │   ├── filesystem.ts # 文件系统抽象层
-│   │   ├── git.ts        # Git 版本历史
-│   │   ├── markdown.ts   # Markdown 解析/序列化
-│   │   ├── schema.ts     # ProseMirror schema
-│   │   └── editorView.ts # 编辑器实例管理
+│   │   ├── filesystem.ts     # File System Access API 抽象层
+│   │   ├── git.ts            # isomorphic-git 版本快照
+│   │   ├── markdown.ts        # Markdown ↔ ProseMirror 双向转换
+│   │   ├── schema.ts         # ProseMirror Schema（表格/删除线等）
+│   │   └── editorView.ts      # 编辑器实例管理
 │   ├── store/
-│   │   └── editorStore.ts # Zustand 全局状态
-│   ├── App.tsx           # 根组件
-│   └── main.tsx          # 入口文件
-├── start.sh              # macOS/Linux 一键启动 (自动检测环境)
-├── start.bat             # Windows 批处理启动
-├── start.ps1             # Windows PowerShell 启动 (功能更强)
-├── package.sh            # 构建并打包为分发包
-├── public/
-├── package.json
+│   │   └── editorStore.ts     # Zustand 全局状态（文件/标签/历史）
+│   ├── App.tsx                # 根组件（拖放/快捷键/主题）
+│   └── main.tsx               # 入口
+├── start.sh / start.bat / start.ps1  # 跨平台一键启动
+├── package.sh                 # 打包分发脚本
 └── README.md
 ```
 
@@ -202,7 +186,7 @@ markflowy/
 1. Fork 本仓库
 2. 创建特性分支 (`git checkout -b feature/amazing-feature`)
 3. 提交更改 (`git commit -m 'Add amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
+4. 推送分支 (`git push origin feature/amazing-feature`)
 5. 创建 Pull Request
 
 ---
@@ -215,6 +199,6 @@ markflowy/
 
 ## 🙏 致谢
 
-- [ProseMirror](https://prosemirror.net/) — 强大的富文本编辑框架
-- [Typora](https://typora.io/) — 设计灵感来源
+- [ProseMirror](https://prosemirror.net/) — 所见即所得编辑框架
+- [Typora](https://typora.io/) — 设计灵感
 - [isomorphic-git](https://isomorphic-git.org/) — 纯 JavaScript Git 实现
