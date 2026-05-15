@@ -183,7 +183,7 @@ export async function searchFilesContent(query: string): Promise<[string, string
           try {
             const text = await fs.readTextFile(fullPath);
             if (text.toLowerCase().includes(q)) {
-              const line = text.split("\n").find(l => l.toLowerCase().includes(q)) || "";
+              const line = text.split("\n").find((l: string) => l.toLowerCase().includes(q)) || "";
               results.push([ep, line.slice(0, 100)]);
             }
           } catch { /* skip */ }
