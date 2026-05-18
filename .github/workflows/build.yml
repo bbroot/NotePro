@@ -55,12 +55,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Re-sign macOS app
+      - name: Re-sign macOS app + recreate dmg
         if: matrix.platform == 'macos-latest'
         run: |
-          APP_PATH=$(find src-tauri/target -name "*.app" -path "*/bundle/*" | head -1)
+          BUNDLE_DIR=$(find src-tauri/target -name "*.app" -path "*/bundle/macos/*" -exec dirname {} \; | head -1)
+          APP_PATH="$BUNDLE_DIR/QNote.app"
+          DMG_DIR=$(dirname "$(dirname "$BUNDLE_DIR")")
+          VERSION=$(node -p "require('./package.json').version")
           codesign --force --deep --sign - "$APP_PATH"
-          echo "App re-signed: $APP_PATH"
+          codesign --deep --verify --verbose=4 "$APP_PATH"
+          echo "App re-signed and verified"
+          # Recreate dmg from re-signed .app
+          OLD_DMG=$(find "$DMG_DIR" -name "*.dmg" | head -1)
+          NEW_DMG="$BUNDLE_DIR/QNote_${VERSION}_aarch64.dmg"
+          hdiutil create -volname QNote -srcfolder "$BUNDLE_DIR" -ov -format UDZO "$NEW_DMG"
+          rm -f "$OLD_DMG"
+          echo "New DMG created: $NEW_DMG"
 
       - name: Pack portable (Windows)
         if: matrix.platform == 'windows-latest'
