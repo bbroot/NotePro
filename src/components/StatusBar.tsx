@@ -11,6 +11,7 @@ export default function StatusBar() {
     historyOpen,
     toggleHistory,
     toggleSettings,
+    toggleSidebar,
     history,
     saveFile,
     saveAs,
@@ -24,7 +25,19 @@ export default function StatusBar() {
 
   return (
     <div className="h-8 flex items-center px-3 gap-2 border-t border-[var(--border)] bg-[var(--bg-secondary)] text-xs text-[var(--text-secondary)] flex-shrink-0 select-none">
-      {/* Left: document name */}
+      {/* Left: sidebar toggle + document name */}
+      <button
+        onClick={toggleSidebar}
+        className="p-1 rounded hover:bg-[var(--bg-primary)] transition-colors"
+        title="切换侧边栏 ⌘B"
+      >
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <rect x="1" y="3" width="14" height="1.5" rx="0.75" />
+          <rect x="1" y="7" width="14" height="1.5" rx="0.75" />
+          <rect x="1" y="11" width="14" height="1.5" rx="0.75" />
+        </svg>
+      </button>
+
       <span className="truncate max-w-[160px] font-medium">{tab.name}</span>
       {tab.isDirty && (
         <span className="w-1.5 h-1.5 rounded-full bg-[var(--warning)]" title="未保存" />

@@ -351,19 +351,6 @@ export default function App() {
           </div>
         </div>
       )}
-      {/* ── Top bar ── */}
-      <div className="h-10 flex items-center px-3 gap-2 border-b border-[var(--border)] bg-[var(--bg-secondary)] flex-shrink-0 select-none">
-        <button onClick={toggleSidebar} className="p-1.5 rounded hover:bg-[var(--bg-primary)] transition-colors" title="切换侧边栏 ⌘B (sidebar)">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-            <rect x="1" y="3" width="14" height="1.5" rx="0.75" />
-            <rect x="1" y="7" width="14" height="1.5" rx="0.75" />
-            <rect x="1" y="11" width="14" height="1.5" rx="0.75" />
-          </svg>
-        </button>
-
-        <div className="text-sm font-semibold tracking-wide">QNote</div>
-      </div>
-
       {/* ── Main area ── */}
       <div className="flex-1 flex overflow-hidden">
         {sidebarOpen && !focusMode && <Sidebar />}
