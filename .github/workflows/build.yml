@@ -100,30 +100,29 @@ jobs:
             artifacts/portable/*
           if-no-files-found: error
 
-  # Release job removed for debugging - will add back once build works
-  # release:
-  #   needs: build
-  #   if: always() && !cancelled()
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Get version
-  #       id: version
-  #       run: |
-  #         VERSION=$(node -p "require('./package.json').version")
-  #         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-  #     - uses: actions/download-artifact@v4
-  #       with:
-  #         path: artifacts
-  #       continue-on-error: true
-  #     - name: Create Release
-  #       uses: softprops/action-gh-release@v1
-  #       with:
-  #         tag_name: v${{ steps.version.outputs.VERSION }}
-  #         name: QNote v${{ steps.version.outputs.VERSION }}
-  #         body: "QNote Markdown Editor v${{ steps.version.outputs.VERSION }}\n\nmacOS 用户：下载 dmg 后执行 `xattr -cr /Applications/QNote.app`\n\nPortable versions: copy the .exe/.AppImage to any folder.\n\nInstallers: .msi (Windows) / .dmg (macOS) / .deb (Linux)"
-  #         prerelease: false
-  #         files: artifacts/**/*
-  #         fail_on_unmatched_files: false
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  release:
+    needs: build
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.VERSION }}
+          name: QNote v${{ steps.version.outputs.VERSION }}
+          body: "QNote Markdown Editor v${{ steps.version.outputs.VERSION }}\n\n**macOS**：下载 dmg → 拖 QNote.app 到 Applications → 终端执行:\n\`xattr -cr /Applications/QNote.app\`\n\nPortable: .exe/.AppImage 直接运行。Installers: .msi/.dmg/.deb"
+          prerelease: false
+          files: artifacts/**/*
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
