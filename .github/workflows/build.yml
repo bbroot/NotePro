@@ -58,22 +58,32 @@ jobs:
       - name: Re-sign macOS app + recreate dmg
         if: matrix.platform == 'macos-latest'
         run: |
-          BUNDLE_DIR=$(find src-tauri/target -name "*.app" -path "*/bundle/macos/*" -exec dirname {} \; | head -1)
-          APP_PATH="$BUNDLE_DIR/QNote.app"
-          DMG_DIR=$(dirname "$(dirname "$BUNDLE_DIR")")
+          # Find the app bundle
+          APP_PATH=$(find src-tauri/target -name "*.app" -path "*/bundle/macos/*" | head -1)
+          BUNDLE_DIR=$(dirname "$APP_PATH")
+          DMG_DIR=$(dirname "$BUNDLE_DIR")/../dmg
           VERSION=$(node -p "require('./package.json').version")
 
-          # Re-sign the app
+          echo "App: $APP_PATH"
+          echo "Bundle dir: $BUNDLE_DIR"
+
+          # Re-sign the app (fixes Tauri's ad-hoc signature issue)
           codesign --force --deep --sign - "$APP_PATH"
           codesign --deep --verify --verbose=4 "$APP_PATH"
-          echo "App re-signed"
+          echo "App re-signed and verified"
 
-          # Recreate dmg with re-signed app only
+          # Create staging folder with proper dmg layout (app + Applications symlink)
+          STAGE="$BUNDLE_DIR/dmg-stage"
+          mkdir -p "$STAGE"
+          cp -R "$APP_PATH" "$STAGE/"
+          ln -s /Applications "$STAGE/Applications"
+
+          # Create new dmg
           OLD_DMG=$(find "$DMG_DIR" -name "*.dmg" | head -1)
           NEW_DMG="$BUNDLE_DIR/QNote_${VERSION}_aarch64.dmg"
-          hdiutil create -volname "QNote" -srcfolder "$BUNDLE_DIR" -ov -format UDZO "$NEW_DMG"
-          rm -f "$OLD_DMG"
-          echo "DMG created: $NEW_DMG"
+          hdiutil create -volname "QNote" -srcfolder "$STAGE" -ov -format UDZO "$NEW_DMG"
+          rm -rf "$STAGE" "$OLD_DMG"
+          echo "New DMG: $NEW_DMG"
 
       - name: Pack portable (Windows)
         if: matrix.platform == 'windows-latest'
