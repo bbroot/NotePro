@@ -120,7 +120,14 @@ jobs:
         with:
           tag_name: v${{ steps.version.outputs.VERSION }}
           name: QNote v${{ steps.version.outputs.VERSION }}
-          body: "QNote Markdown Editor v${{ steps.version.outputs.VERSION }}\n\n**macOS**：下载 dmg → 拖 QNote.app 到 Applications → 终端执行:\n\`xattr -cr /Applications/QNote.app\`\n\nPortable: .exe/.AppImage 直接运行。Installers: .msi/.dmg/.deb"
+          body: >
+            QNote Markdown Editor v${{ steps.version.outputs.VERSION }}
+
+            **macOS**: 下载 dmg → 拖 QNote.app 到 Applications →
+            终端执行: xattr -cr /Applications/QNote.app
+
+            Portable: .exe/.AppImage 直接运行。
+            Installers: .msi / .dmg / .deb
           prerelease: false
           files: artifacts/**/*
           fail_on_unmatched_files: false
