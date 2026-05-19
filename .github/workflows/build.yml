@@ -62,15 +62,46 @@ jobs:
           APP_PATH="$BUNDLE_DIR/QNote.app"
           DMG_DIR=$(dirname "$(dirname "$BUNDLE_DIR")")
           VERSION=$(node -p "require('./package.json').version")
+
+          # Re-sign the app
           codesign --force --deep --sign - "$APP_PATH"
           codesign --deep --verify --verbose=4 "$APP_PATH"
           echo "App re-signed and verified"
-          # Recreate dmg from re-signed .app
+
+          # Create a temp staging folder with app + launch script
+          STAGE="$BUNDLE_DIR/QNote-stage"
+          mkdir "$STAGE"
+          cp -R "$APP_PATH" "$STAGE/"
+
+          # Launch script: removes quarantine + opens app
+          cat > "$STAGE/LaunchQNote.command" << 'SCRIPT_EOF'
+#!/bin/bash
+APP="/Applications/QNote.app"
+# Copy app to Applications if not there
+if [ ! -d "$APP" ]; then
+  SRC="$(dirname "$0")/QNote.app"
+  cp -R "$SRC" "/Applications/" 2>/dev/null
+  if [ $? -ne 0 ]; then
+    osascript << OSA
+    display dialog "安装失败。请手动将 QNote.app 拖到 Applications 文件夹。" buttons {"好"} default button "好"
+OSA
+    exit 1
+  fi
+fi
+# Clear quarantine
+xattr -cr "$APP"
+# Open the app
+open "$APP"
+echo "QNote launched. You can close this window."
+SCRIPT_EOF
+          chmod +x "$STAGE/LaunchQNote.command"
+
+          # Create DMG with staged content
           OLD_DMG=$(find "$DMG_DIR" -name "*.dmg" | head -1)
           NEW_DMG="$BUNDLE_DIR/QNote_${VERSION}_aarch64.dmg"
-          hdiutil create -volname QNote -srcfolder "$BUNDLE_DIR" -ov -format UDZO "$NEW_DMG"
+          hdiutil create -volname "QNote" -srcfolder "$STAGE" -ov -format UDZO "$NEW_DMG"
           rm -f "$OLD_DMG"
-          echo "New DMG created: $NEW_DMG"
+          echo "New DMG created with launch script: $NEW_DMG"
 
       - name: Pack portable (Windows)
         if: matrix.platform == 'windows-latest'
@@ -120,7 +151,7 @@ jobs:
         with:
           tag_name: v${{ steps.version.outputs.VERSION }}
           name: QNote v${{ steps.version.outputs.VERSION }}
-          body: "QNote Markdown Editor v${{ steps.version.outputs.VERSION }}\n\nPortable versions: copy the .exe/.AppImage to any folder, run directly without installation.\n\nInstallers: .msi (Windows) / .dmg (macOS) / .deb (Linux)"
+          body: "QNote Markdown Editor v${{ steps.version.outputs.VERSION }}\n\n**macOS 用户**：打开 dmg 后双击 _LaunchQNote.command_ 即可自动安装并启动（首次运行会自动清除 macOS 安全限制）。\n\nPortable versions: copy the .exe/.AppImage to any folder, run directly without installation.\n\nInstallers: .msi (Windows) / .dmg (macOS) / .deb (Linux)"
           prerelease: false
           files: artifacts/**/*
           fail_on_unmatched_files: false
