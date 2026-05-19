@@ -77,22 +77,12 @@ jobs:
           cat > "$STAGE/LaunchQNote.command" << 'SCRIPT_EOF'
 #!/bin/bash
 APP="/Applications/QNote.app"
-# Copy app to Applications if not there
+SRC="$(dirname "$0")/QNote.app"
 if [ ! -d "$APP" ]; then
-  SRC="$(dirname "$0")/QNote.app"
-  cp -R "$SRC" "/Applications/" 2>/dev/null
-  if [ $? -ne 0 ]; then
-    osascript << OSA
-    display dialog "安装失败。请手动将 QNote.app 拖到 Applications 文件夹。" buttons {"好"} default button "好"
-OSA
-    exit 1
-  fi
+  cp -R "$SRC" "/Applications/" 2>/dev/null || echo "copy failed"
 fi
-# Clear quarantine
-xattr -cr "$APP"
-# Open the app
-open "$APP"
-echo "QNote launched. You can close this window."
+xattr -cr "$APP" && open "$APP"
+echo "QNote launched."
 SCRIPT_EOF
           chmod +x "$STAGE/LaunchQNote.command"
 
