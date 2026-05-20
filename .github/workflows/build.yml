@@ -125,40 +125,23 @@ jobs:
         with:
           path: artifacts
 
-      - name: Delete existing release & tag
+      - name: Create/Update Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VER="v${{ steps.version.outputs.VERSION }}"
-          # Delete the GitHub release (if it exists)
-          RELEASE_ID=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/tags/$VER" | \
-            python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('id',''))" 2>/dev/null)
-          if [ -n "$RELEASE_ID" ]; then
-            curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-              "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
-            echo "Deleted release $RELEASE_ID"
-          fi
-          # Delete the git tag (if it exists)
-          curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-            "https://api.github.com/repos/${{ github.repository }}/git/refs/tags/$VER"
-          echo "Tag cleanup done"
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ steps.version.outputs.VERSION }}
-          name: QNote v${{ steps.version.outputs.VERSION }}
-          body: >
-            QNote Markdown Editor v${{ steps.version.outputs.VERSION }}
+          # Delete existing release (keep the git tag)
+          gh release delete "$VER" -y -R "${{ github.repository }}" 2>/dev/null || true
+          # Create new release with all artifacts
+          gh release create "$VER" \
+            artifacts/**/* \
+            --title "QNote $VER" \
+            --notes "QNote Markdown Editor $VER
 
             **macOS**: 下载 dmg → 拖 QNote.app 到 Applications →
             终端执行: xattr -cr /Applications/QNote.app
 
             Portable: .exe/.AppImage 直接运行。
-            Installers: .msi / .dmg / .deb
-          prerelease: false
-          files: artifacts/**/*
-          fail_on_unmatched_files: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            Installers: .msi / .dmg / .deb" \
+            --repo "${{ github.repository }}" \
+            --target "${{ github.sha }}"
