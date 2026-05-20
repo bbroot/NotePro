@@ -145,13 +145,19 @@ jobs:
       - name: List artifacts
         run: find artifacts -type f | head -20
 
-      - name: Create Release
+      - name: Create & Upload Release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.version.outputs.VERSION }}
         run: |
-          gh release create "v$VERSION" \
-            --repo "${{ github.repository }}" \
-            --title "QNote v$VERSION" \
-            --notes "QNote Markdown Editor v$VERSION"
-          find artifacts -type f -print0 | xargs -0 gh release upload "v$VERSION" --repo "${{ github.repository }}"
+          REQ="{\"tag_name\":\"v$VERSION\",\"name\":\"QNote v$VERSION\"}"
+          RESP=$(curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${{ github.repository }}/releases" -d "$REQ")
+          echo "Create release: $RESP"
+          UPLOAD_BASE=$(echo "$RESP" | python3 -c "import sys,json; print(json.load(sys.stdin)['upload_url'].split('{')[0])")
+          echo "Upload base: $UPLOAD_BASE"
+          find artifacts -type f | while IFS= read -r f; do
+            NAME=$(basename "$f")
+            echo "Uploading $NAME ($(wc -c < "$f") bytes)..."
+            curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/octet-stream" "$UPLOAD_BASE?name=$NAME" --data-binary "@$f"
+            echo " done"
+          done
