@@ -55,35 +55,39 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Re-sign macOS app + recreate dmg
+      - name: Re-sign macOS app + create dmg with launch script
         if: matrix.platform == 'macos-latest'
         run: |
-          # Find the app bundle
-          APP_PATH=$(find src-tauri/target -name "*.app" -path "*/bundle/macos/*" | head -1)
-          BUNDLE_DIR=$(dirname "$APP_PATH")
-          DMG_DIR=$(dirname "$BUNDLE_DIR")/../dmg
+          set -e
           VERSION=$(node -p "require('./package.json').version")
 
+          APP_PATH=$(find src-tauri/target -name "*.app" -path "*/bundle/macos/*" | head -1)
           echo "App: $APP_PATH"
-          echo "Bundle dir: $BUNDLE_DIR"
 
-          # Re-sign the app (fixes Tauri's ad-hoc signature issue)
           codesign --force --deep --sign - "$APP_PATH"
           codesign --deep --verify --verbose=4 "$APP_PATH"
-          echo "App re-signed and verified"
+          echo "App re-signed"
 
-          # Create staging folder with proper dmg layout (app + Applications symlink)
-          STAGE="$BUNDLE_DIR/dmg-stage"
-          mkdir -p "$STAGE"
-          cp -R "$APP_PATH" "$STAGE/"
+          STAGE=$(mktemp -d)
+          cp -R "$APP_PATH" "$STAGE/QNote.app"
+
+          echo '#!/bin/bash' > "$STAGE/Launch QNote.command"
+          echo 'APP="/Applications/QNote.app"' >> "$STAGE/Launch QNote.command"
+          echo 'SRC="$(dirname "$0")/QNote.app"' >> "$STAGE/Launch QNote.command"
+          echo 'if [ ! -d "$APP" ]; then' >> "$STAGE/Launch QNote.command"
+          echo '  cp -R "$SRC" "/Applications/" 2>/dev/null || true' >> "$STAGE/Launch QNote.command"
+          echo 'fi' >> "$STAGE/Launch QNote.command"
+          echo 'xattr -cr "$APP"' >> "$STAGE/Launch QNote.command"
+          echo 'open "$APP"' >> "$STAGE/Launch QNote.command"
+          echo 'echo "QNote launched."' >> "$STAGE/Launch QNote.command"
+          chmod +x "$STAGE/Launch QNote.command"
           ln -s /Applications "$STAGE/Applications"
 
-          # Create new dmg
-          OLD_DMG=$(find "$DMG_DIR" -name "*.dmg" | head -1)
-          NEW_DMG="$BUNDLE_DIR/QNote_${VERSION}_aarch64.dmg"
-          hdiutil create -volname "QNote" -srcfolder "$STAGE" -ov -format UDZO "$NEW_DMG"
-          rm -rf "$STAGE" "$OLD_DMG"
-          echo "New DMG: $NEW_DMG"
+          DMG="src-tauri/target/release/bundle/dmg/QNote_${VERSION}_aarch64.dmg"
+          mkdir -p "$(dirname "$DMG")"
+          hdiutil create -volname "QNote" -srcfolder "$STAGE" -ov -format UDZO "$DMG"
+          rm -rf "$STAGE"
+          echo "DMG: $DMG"
 
       - name: Pack portable (Windows)
         if: matrix.platform == 'windows-latest'
