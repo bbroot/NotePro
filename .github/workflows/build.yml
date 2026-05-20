@@ -146,13 +146,12 @@ jobs:
         run: find artifacts -type f | head -20
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ steps.version.outputs.VERSION }}
-          name: QNote v${{ steps.version.outputs.VERSION }}
-          body: "QNote Markdown Editor v${{ steps.version.outputs.VERSION }} — macOS: download dmg and drag QNote.app to Applications, then run: xattr -cr /Applications/QNote.app"
-          prerelease: false
-          files: artifacts/**/*
-          fail_on_unmatched_files: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: |
+          gh release create "v$VERSION" \
+            --repo "${{ github.repository }}" \
+            --title "QNote v$VERSION" \
+            --notes "QNote Markdown Editor v$VERSION"
+          find artifacts -type f -print0 | xargs -0 gh release upload "v$VERSION" --repo "${{ github.repository }}"
