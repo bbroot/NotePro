@@ -59,7 +59,62 @@
 
 ## 🚀 安装使用
 
-### 方式一：直接使用（推荐）
+### 🖥️ 桌面版（QNote）
+
+> Tauri 打包的桌面客户端，支持 macOS / Windows / Linux。
+
+**下载地址：** [GitHub Releases](https://github.com/bbroot/QNote/releases)
+
+#### 🍎 macOS 安装说明
+
+下载 `.dmg` 后：
+
+1. 打开 `QNote.dmg`，把 **QNote.app** 拖到「应用程序」文件夹
+2. 首次打开会在「启动台」里看到 QNote 图标，点击它
+3. macOS 会弹出提示：「无法验证 QNote.app 是否包含恶意软件…」
+
+**✅ 正常！这是没有 Apple 公证的开源软件的正常行为。** 按以下步骤打开：
+
+<details>
+<summary><strong>方式一（推荐）：系统设置里允许</strong></summary>
+
+1. 关闭刚才的警告弹窗（点「取消」）
+2. 打开「系统设置 → 隐私与安全性」，往下滑到最下方
+3. 看到「QNote 已被阻止…」，点击「仍要打开」
+4. 再次确认「打开」，之后就不会再弹了
+
+</details>
+
+<details>
+<summary><strong>方式二：右键打开</strong></summary>
+
+1. 在 Finder 里找到「应用程序 → QNote.app」
+2. **右键**（或 Control + 点击）QNote.app
+3. 在菜单里选「打开」
+4. 弹窗点「打开」，以后直接双击就能打开了
+
+</details>
+
+<details>
+<summary><strong>方式三：终端一键清除隔离属性</strong></summary>
+
+```bash
+xattr -cr /Applications/QNote.app
+open /Applications/QNote.app
+```
+
+</details>
+
+> 💡 VS Code、Obsidian 等开源软件在未购买 Apple Developer 账号前也是同样流程。
+
+#### 🪟 Windows / 🐧 Linux
+
+- **Windows**：下载 `.exe` 安装包，双击安装即可
+- **Linux**：下载 `.AppImage` 或 `.deb`，给执行权限后运行
+
+---
+
+### 方式一：浏览器直接使用（推荐）
 
 ```bash
 # 克隆仓库
