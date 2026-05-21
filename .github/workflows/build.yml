@@ -55,7 +55,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Re-sign macOS app + create dmg with launch script
+      - name: Re-sign macOS app + recreate dmg
         if: matrix.platform == 'macos-latest'
         run: |
           set -e
@@ -68,19 +68,9 @@ jobs:
           codesign --deep --verify --verbose=4 "$APP_PATH"
           echo "App re-signed"
 
+          # Standard dmg layout: app + Applications symlink (no scripts)
           STAGE=$(mktemp -d)
-          cp -R "$APP_PATH" "$STAGE/QNote.app"
-
-          echo '#!/bin/bash' > "$STAGE/Launch QNote.command"
-          echo 'APP="/Applications/QNote.app"' >> "$STAGE/Launch QNote.command"
-          echo 'SRC="$(dirname "$0")/QNote.app"' >> "$STAGE/Launch QNote.command"
-          echo 'if [ ! -d "$APP" ]; then' >> "$STAGE/Launch QNote.command"
-          echo '  cp -R "$SRC" "/Applications/" 2>/dev/null || true' >> "$STAGE/Launch QNote.command"
-          echo 'fi' >> "$STAGE/Launch QNote.command"
-          echo 'xattr -cr "$APP"' >> "$STAGE/Launch QNote.command"
-          echo 'open "$APP"' >> "$STAGE/Launch QNote.command"
-          echo 'echo "QNote launched."' >> "$STAGE/Launch QNote.command"
-          chmod +x "$STAGE/Launch QNote.command"
+          cp -R "$APP_PATH" "$STAGE/"
           ln -s /Applications "$STAGE/Applications"
 
           DMG="src-tauri/target/release/bundle/dmg/QNote_${VERSION}_aarch64.dmg"
