@@ -1,6 +1,6 @@
 {
   "identifier": "default",
-  "description": "Default capabilities for MarkFlowy",
+  "description": "Default capabilities for Note Pro",
   "windows": ["main"],
   "permissions": [
     "core:default",

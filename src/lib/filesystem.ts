@@ -1,5 +1,5 @@
 /**
- * MarkFlowy Filesystem Layer — Tauri v2 Native
+ * Note Pro Filesystem Layer — Tauri v2 Native
  * 
  * Uses @tauri-apps/plugin-fs for file operations and @tauri-apps/plugin-dialog for pickers.
  * Falls back to In-Memory + IndexedDB for non-file operations (snapshots).
@@ -221,7 +221,7 @@ export interface Snapshot {
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open("markflowy", 1);
+    const req = indexedDB.open("note-pro", 1);
     req.onupgradeneeded = () => {
       const db = req.result;
       if (!db.objectStoreNames.contains("snapshots")) {

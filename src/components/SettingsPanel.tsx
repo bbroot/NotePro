@@ -101,7 +101,7 @@ export default function SettingsPanel() {
                 whiteSpace: "nowrap",
               }}
             >
-              MarkFlowy 编辑器
+              Note Pro 编辑器
             </span>
           </div>
           <div className="flex flex-wrap gap-1.5 mt-2">
@@ -223,7 +223,7 @@ export default function SettingsPanel() {
         <section>
           <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">关于</h3>
           <div className="bg-[var(--bg-secondary)] rounded-lg px-3 py-3 text-xs space-y-1">
-            <div className="font-semibold text-base">MarkFlowy</div>
+            <div className="font-semibold text-base">Note Pro</div>
             <div className="text-[var(--text-secondary)]">轻量 Markdown 编辑器</div>
             <div className="text-[var(--text-secondary)]">版本 0.2.0</div>
             <div className="text-[var(--text-secondary)] mt-2">技术栈：React + ProseMirror + Zustand</div>

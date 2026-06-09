@@ -29,7 +29,7 @@ export default function BrowserCheck({ children }: Props) {
             浏览器版本过低
           </h2>
           <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-4">
-            MarkFlowy 需要现代浏览器才能运行。请升级到以下任一浏览器：
+            Note Pro 需要现代浏览器才能运行。请升级到以下任一浏览器：
           </p>
           <ul className="text-sm text-[var(--text-secondary)] space-y-1">
             <li>✅ Chrome 86+ / Edge 86+</li>

@@ -22,7 +22,7 @@ async function gitDB(): Promise<IDBDatabase> {
   if (_gitDBPromise) return _gitDBPromise;
 
   _gitDBPromise = new Promise((resolve, reject) => {
-    const req = indexedDB.open("markflowy-git", 1);
+    const req = indexedDB.open("note-pro-git", 1);
     req.onupgradeneeded = () => {
       const db = req.result;
       if (!db.objectStoreNames.contains("objects")) {
@@ -121,7 +121,7 @@ interface WorkspaceMeta {
   head: string | null;
 }
 
-const WORKSPACE_KEY = "markflowy-workspace";
+const WORKSPACE_KEY = "note-pro-workspace";
 
 let _metaDB: IDBDatabase | null = null;
 let _metaDBPromise: Promise<IDBDatabase> | null = null;
@@ -131,7 +131,7 @@ async function openMetaDB(): Promise<IDBDatabase> {
   if (_metaDBPromise) return _metaDBPromise;
 
   _metaDBPromise = new Promise((resolve, reject) => {
-    const req = indexedDB.open("markflowy-meta", 1);
+    const req = indexedDB.open("note-pro-meta", 1);
     req.onupgradeneeded = () => {
       const db = req.result;
       if (!db.objectStoreNames.contains("meta")) {
@@ -224,7 +224,7 @@ export async function wrapContent(filePath: string, content: string): Promise<st
   });
 
   // Write commit
-  const author = { name: "MarkFlowy", email: "markflowy@local", timestamp: Math.floor(Date.now() / 1000), timezoneOffset: 0 };
+  const author = { name: "Note Pro", email: "note-pro@local", timestamp: Math.floor(Date.now() / 1000), timezoneOffset: 0 };
   const commitOid = await git.writeCommit({
     fs: idb as any,
     dir: "/",

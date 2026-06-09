@@ -7,7 +7,7 @@ export default function WelcomeScreen() {
     <div className="flex-1 flex items-center justify-center bg-[var(--bg-primary)]">
       <div className="text-center max-w-md px-8">
         <div className="text-6xl mb-6">📝</div>
-        <h1 className="text-2xl font-bold mb-2">欢迎使用 MarkFlowy</h1>
+        <h1 className="text-2xl font-bold mb-2">欢迎使用 Note Pro</h1>
         <p className="text-[var(--text-secondary)] mb-8 text-sm leading-relaxed">
           轻量、快速、有记忆的 Markdown 编辑器。
           <br />

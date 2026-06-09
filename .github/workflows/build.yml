@@ -44,6 +44,27 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
+      - name: Import macOS certificates
+        if: matrix.platform == 'macos-latest'
+        env:
+          CERT_MAC_APP_DIST: ${{ secrets.CERTIFICATE_MAC_APP_DIST }}
+          CERT_DEVELOPER_ID: ${{ secrets.CERTIFICATE_DEVELOPER_ID_APP }}
+          CERT_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+        run: |
+          echo "$CERT_MAC_APP_DIST" | base64 -d > /tmp/mac_app.p12
+          echo "$CERT_DEVELOPER_ID" | base64 -d > /tmp/dev_id_app.p12
+          security create-keychain -p temp build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p temp build.keychain
+          security import /tmp/mac_app.p12 -k build.keychain \
+            -P "$CERT_PASSWORD" -T /usr/bin/codesign 2>&1
+          security import /tmp/dev_id_app.p12 -k build.keychain \
+            -P "$CERT_PASSWORD" -T /usr/bin/codesign 2>&1
+          security set-key-partition-list -S apple-tool:,apple: \
+            -s -k temp build.keychain 2>&1
+          echo "Certs imported"
+          security find-identity -v -p codesigning 2>&1
+
       - name: Install Linux system deps
         if: matrix.platform == 'ubuntu-latest'
         run: |
@@ -55,29 +76,55 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Re-sign macOS app + recreate dmg
+      - name: Notarize macOS DMG
         if: matrix.platform == 'macos-latest'
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
         run: |
           set -e
-          VERSION=$(node -p "require('./package.json').version")
+          DMG=$(find src-tauri/target -name "*.dmg" -path "*/bundle/*" | head -1)
+          if [ -z "$DMG" ]; then
+            echo "No DMG found, skipping notarization"
+            exit 0
+          fi
+          echo "Notarizing: $DMG"
+          xcrun notarytool submit "$DMG" \
+            --apple-id "$APPLE_ID" \
+            --team-id "2X3285DG44" \
+            --password "$APPLE_PASSWORD" \
+            --wait 2>&1
+          echo "Stapling ticket..."
+          xcrun stapler staple "$DMG" 2>&1 || echo "Staple skipped (not always needed)"
 
-          APP_PATH=$(find src-tauri/target -name "*.app" -path "*/bundle/macos/*" | head -1)
-          echo "App: $APP_PATH"
+      - name: Validate macOS build
+        if: matrix.platform == 'macos-latest'
+        run: |
+          echo "=== BINARY CHECK ==="
+          find src-tauri/target -name "*.app" -path "*/bundle/*" -exec codesign -dvv {} \; 2>&1 | head -20
+          echo "=== DMG CHECK ==="
+          find src-tauri/target -name "*.dmg" -path "*/bundle/*" -exec spctl -a -t open --context context:primary-signature -v {} \; 2>&1 || true
+          echo "=== PKG CHECK ==="
+          find src-tauri/target -name "*.pkg" -path "*/bundle/*" -exec pkgutil --check-signature {} \; 2>&1 || true
 
-          codesign --force --deep --sign - "$APP_PATH"
-          codesign --deep --verify --verbose=4 "$APP_PATH"
-          echo "App re-signed"
-
-          # Standard dmg layout: app + Applications symlink (no scripts)
-          STAGE=$(mktemp -d)
-          cp -R "$APP_PATH" "$STAGE/"
-          ln -s /Applications "$STAGE/Applications"
-
-          DMG="src-tauri/target/release/bundle/dmg/QNote_${VERSION}_aarch64.dmg"
-          mkdir -p "$(dirname "$DMG")"
-          hdiutil create -volname "QNote" -srcfolder "$STAGE" -ov -format UDZO "$DMG"
-          rm -rf "$STAGE"
-          echo "DMG: $DMG"
+      - name: Upload to App Store Connect
+        if: matrix.platform == 'macos-latest'
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        run: |
+          set -e
+          PKG=$(find src-tauri/target -name "*.pkg" -path "*/bundle/*" | head -1)
+          if [ -z "$PKG" ]; then
+            echo "No .pkg found, skipping App Store upload"
+            exit 0
+          fi
+          echo "Uploading to App Store Connect: $PKG"
+          xcrun altool --upload-app -f "$PKG" \
+            --type macos \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_PASSWORD" \
+            --bundle-id "com.bbroot.QNote" 2>&1 || echo "Upload failed - you may need to upload manually via Transporter"
 
       - name: Pack portable (Windows)
         if: matrix.platform == 'windows-latest'
@@ -86,7 +133,7 @@ jobs:
           EXE=$(find src-tauri/target -name "*.exe" -path "*/bundle/*" | head -1)
           if [ -f "$EXE" ]; then
             mkdir -p artifacts/portable
-            cp "$EXE" "artifacts/portable/QNote-${{ matrix.platform }}-v$(node -p 'require("./package.json").version').exe"
+            cp "$EXE" "artifacts/portable/NotePro-${{ matrix.platform }}-v$(node -p 'require("./package.json").version').exe"
             echo "Portable exe copied"
           fi
 
@@ -144,7 +191,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.version.outputs.VERSION }}
         run: |
-          REQ="{\"tag_name\":\"v$VERSION\",\"name\":\"QNote v$VERSION\"}"
+          REQ="{\"tag_name\":\"v$VERSION\",\"name\":\"Note Pro v$VERSION\"}"
           RESP=$(curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${{ github.repository }}/releases" -d "$REQ")
           echo "Create release: $RESP"
           UPLOAD_BASE=$(echo "$RESP" | python3 -c "import sys,json; print(json.load(sys.stdin)['upload_url'].split('{')[0])")

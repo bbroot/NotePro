@@ -1,11 +1,11 @@
-# MarkFlowy
+# Note Pro
 
 **浏览器里的 Typora** — 零安装、零配置，开箱即用的 Markdown 所见即所得编辑器。数据完全存储在本地，无后端、无账号、无隐私顾虑。
 
 
 ---
 
-## 🎯 为什么选 MarkFlowy？
+## 🎯 为什么选 Note Pro？
 
 | 特性 | 说明 |
 |------|------|
@@ -59,19 +59,19 @@
 
 ## 🚀 安装使用
 
-### 🖥️ 桌面版（QNote）
+### 🖥️ 桌面版（Note Pro）
 
 > Tauri 打包的桌面客户端，支持 macOS / Windows / Linux。
 
-**下载地址：** [GitHub Releases](https://github.com/bbroot/QNote/releases)
+**下载地址：** [GitHub Releases](https://github.com/bbroot/Note Pro/releases)
 
 #### 🍎 macOS 安装说明
 
 下载 `.dmg` 后：
 
-1. 打开 `QNote.dmg`，把 **QNote.app** 拖到「应用程序」文件夹
-2. 首次打开会在「启动台」里看到 QNote 图标，点击它
-3. macOS 会弹出提示：「无法验证 QNote.app 是否包含恶意软件…」
+1. 打开 `Note Pro.dmg`，把 **Note Pro.app** 拖到「应用程序」文件夹
+2. 首次打开会在「启动台」里看到 Note Pro 图标，点击它
+3. macOS 会弹出提示：「无法验证 Note Pro.app 是否包含恶意软件…」
 
 **✅ 正常！这是没有 Apple 公证的开源软件的正常行为。** 按以下步骤打开：
 
@@ -80,7 +80,7 @@
 
 1. 关闭刚才的警告弹窗（点「取消」）
 2. 打开「系统设置 → 隐私与安全性」，往下滑到最下方
-3. 看到「QNote 已被阻止…」，点击「仍要打开」
+3. 看到「Note Pro 已被阻止…」，点击「仍要打开」
 4. 再次确认「打开」，之后就不会再弹了
 
 </details>
@@ -88,8 +88,8 @@
 <details>
 <summary><strong>方式二：右键打开</strong></summary>
 
-1. 在 Finder 里找到「应用程序 → QNote.app」
-2. **右键**（或 Control + 点击）QNote.app
+1. 在 Finder 里找到「应用程序 → Note Pro.app」
+2. **右键**（或 Control + 点击）Note Pro.app
 3. 在菜单里选「打开」
 4. 弹窗点「打开」，以后直接双击就能打开了
 
@@ -99,8 +99,8 @@
 <summary><strong>方式三：终端一键清除隔离属性</strong></summary>
 
 ```bash
-xattr -cr /Applications/QNote.app
-open /Applications/QNote.app
+xattr -cr /Applications/Note Pro.app
+open /Applications/Note Pro.app
 ```
 
 </details>
@@ -118,8 +118,8 @@ open /Applications/QNote.app
 
 ```bash
 # 克隆仓库
-git clone https://github.com/bbroot/MarkFlowy.git
-cd MarkFlowy
+git clone https://github.com/bbroot/Note Pro.git
+cd Note Pro
 
 # 安装依赖
 npm install
@@ -147,7 +147,7 @@ npx serve dist
 
 ```bash
 npm run package
-# 产物: markflowy-<version>-portable.zip (~300KB)
+# 产物: note-pro-<version>-portable.zip (~300KB)
 ```
 
 **macOS / Linux**: 解压后运行 `bash start.sh`
@@ -207,7 +207,7 @@ npm run package
 ## 📦 项目结构
 
 ```
-markflowy/
+note-pro/
 ├── src/
 │   ├── components/
 │   │   ├── Editor.tsx         # ProseMirror 编辑器 + 源码模式
@@ -247,7 +247,7 @@ markflowy/
 
 ## 📄 许可证
 
-[MIT License](LICENSE) © 2026 MarkFlowy
+[MIT License](LICENSE) © 2026 Note Pro
 
 ---
 
