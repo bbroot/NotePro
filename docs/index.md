@@ -56,4 +56,6 @@ https://github.com/bbroot/NotePro/issues
 
 ---
 
-**The short version:** Your notes stay on your computer. We never see them, never touch them, never know they exist.
+[Support](./support) · [Copyright](./copyright)
+
+The short version: Your notes stay on your computer. We never see them, never touch them, never know they exist.

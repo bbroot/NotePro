@@ -33,4 +33,4 @@ Yes. Note Pro works entirely offline. No internet connection required.
 
 ---
 
-[Privacy Policy](./)
+[Privacy Policy](./) · [Copyright](./copyright)
