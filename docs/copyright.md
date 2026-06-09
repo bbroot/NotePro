@@ -6,7 +6,7 @@
 
 ## Copyright
 
-© 2026 **chenggen fang** (方成根). All rights reserved.
+© 2026 **bbroot** . All rights reserved.
 
 Note Pro and its source code are protected by copyright law. Unauthorized reproduction, distribution, or modification is prohibited except as expressly permitted below.
 
