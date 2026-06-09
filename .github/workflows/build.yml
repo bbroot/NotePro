@@ -107,11 +107,32 @@ jobs:
           echo "=== PKG CHECK ==="
           find src-tauri/target -name "*.pkg" -path "*/bundle/*" -exec pkgutil --check-signature {} \; 2>&1 || true
 
+      - name: Build .pkg for App Store
+        if: matrix.platform == 'macos-latest'
+        env:
+          TEAM_ID: 2X3285DG44
+        run: |
+          set -e
+          APP=$(find src-tauri/target -name "*.app" -path "*/bundle/*" | head -1)
+          if [ -z "$APP" ]; then
+            echo "No .app found, skip .pkg creation"
+            exit 1
+          fi
+          PKG_DIR="src-tauri/target/release/bundle/pkg"
+          mkdir -p "$PKG_DIR"
+          PKG_PATH="$PKG_DIR/NotePro.pkg"
+          echo "Creating .pkg from $APP..."
+          productbuild --component "$APP" /Applications \
+            --sign "3rd Party Mac Developer Application: chenggen fang ($TEAM_ID)" \
+            "$PKG_PATH" 2>&1
+          echo "PKG created: $PKG_PATH"
+
       - name: Upload to App Store Connect
         if: matrix.platform == 'macos-latest'
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          TEAM_ID: 2X3285DG44
         run: |
           set -e
           PKG=$(find src-tauri/target -name "*.pkg" -path "*/bundle/*" | head -1)
@@ -124,7 +145,8 @@ jobs:
             --type macos \
             --apple-id "$APPLE_ID" \
             --password "$APPLE_PASSWORD" \
-            --bundle-id "com.bbroot.QNote" 2>&1 || echo "Upload failed - you may need to upload manually via Transporter"
+            --bundle-id "com.bbroot.QNote" \
+            --team-id "$TEAM_ID" 2>&1 || echo "Upload failed - you may need to upload manually via Transporter"
 
       - name: Pack portable (Windows)
         if: matrix.platform == 'windows-latest'
